@@ -31,7 +31,7 @@ def decryptFile(filePath, key):
     with open(filePath, "rb") as file:
         encrypted_data = file.read()
         decrypted_data = f.decrypt(encrypted_data)
-    with open("//home/kali/Documents/ACS-A1/FileToEncrypt1.txt", "wb") as file:
+    with open(".\File1.txt", "wb") as file:
         file.write(decrypted_data)   
 
 
@@ -57,7 +57,7 @@ FernetInstance = Fernet(symmetricKey)
 
 # A previously made key using opensll is loaded into the program and 
 # read and serialized
-with open("/home/kali/Documents/ACS-A1/Keys/public_key.key", "rb") as key_file:
+with open(".\Keys\public_key.key", "rb") as key_file:
     public_key = serialization.load_pem_public_key(
       key_file.read(),
       backend=default_backend()
@@ -76,7 +76,7 @@ encryptedSymmetricKey = public_key.encrypt(
 with open("encryptedSymmertricKey.key", "wb") as key_file:
     key_file.write(encryptedSymmetricKey)
 
-filePath = "//home/kali/Documents/ACS-A1/FileToEncrypt.txt"
+filePath = ".\File1.txt"
 # open the file that is to be encrypted... and encrypt it
 with open(filePath, "rb") as file:
     file_data = file.read()
@@ -87,7 +87,7 @@ with open(filePath, "rb") as file:
 with open(filePath, "wb") as file:
     file.write(encrypted_data)
 # load up the encrypted key to send to the server that is running. 
-    eKeyFilePath = "./encryptedSymmertricKey.key"
+    eKeyFilePath = ".\encryptedSymmertricKey.key"
 # Create the variables for host/port
 
 

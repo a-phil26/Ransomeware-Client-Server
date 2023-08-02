@@ -18,7 +18,7 @@ class ClientHandler(socketserver.BaseRequestHandler):
         
         # load the private key first
         # Then read the contents and store it in private_key
-        with open("./Keys/pub_priv_pair.key", "rb") as private_key_file:
+        with open(".\Keys\pub_priv_pair.key", "rb") as private_key_file:
             private_key = serialization.load_pem_private_key(
                 private_key_file.read(),
                 password=None
