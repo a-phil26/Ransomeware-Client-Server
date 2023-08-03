@@ -14,6 +14,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.fernet import Fernet
 import socket
 import argparse
+import ipaddress
+import constants
 
 
 class AttrDict(dict):
@@ -55,6 +57,27 @@ def sendEncryptedKey(eKeyFilePath):
             decryptFile(filePath, returned_key)
 
 
+# FUNCTION      : parse_host_port
+# DESCRIPTION   : this function will parse the IPendpoint to useable data
+#  
+
+def parse_host_port(ip_port):
+    try:
+        ip = ipaddress.ip_address(ip_port[0])
+    except ValueError:
+        raise ValueError("Invalid host:port '%s", ip_port)
+
+    if len(ip_port) == 1:
+        # no port specified
+        port = 8000
+    else:
+        try:
+            port = int(ip_port[1])
+            if port < constants.MIN_PORT or port > constants.MAX_PORT:
+                print("Invalid host:port '%s", ip_port)
+           
+        except ValueError:
+            raise ValueError("Invalid host:port '%s", ip_port)
  
 
 if __name__ == "__main__":
@@ -77,8 +100,12 @@ if __name__ == "__main__":
     allargs = (vars(args))
     allargs = AttrDict(allargs)
     
-    if allargs.file is None:
-        print("None")
+    #parse the IPEndpoint
+    if allargs.file is not None:
+        ip_port = args.configipendpoint.rsplit(":", 1)
+        parse_host_port(ip_port)
+        
+        
     # This line generates a Fernet key
     symmetricKey = Fernet.generate_key()
     # The key is then passed into the Fernet instance
