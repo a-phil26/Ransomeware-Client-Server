@@ -15,7 +15,7 @@ from cryptography.fernet import Fernet
 import socket
 import argparse
 import ipaddress
-import constants
+import Ransomeware.constants as constants
 
 
 class AttrDict(dict):

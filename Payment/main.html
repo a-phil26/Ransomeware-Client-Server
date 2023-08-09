@@ -2,10 +2,22 @@
 <html lang="en-CA">
 <head>
     <title>Ransomeware Payment</title> 
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script><!--React packages-->
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> <!--JS Compiler-->
+
+
+    <script type="text/jsx">
+
+        function Header(){
+            return (<h1>Develop. Preview. Ship. 🚀</h1>)
+        }
+        ReactDOM.render(<Header />, app)
+    </script>
 </head>
 <body>
     <h3>Enter Payment</h3>
-    <div></div>
+    <div id="app"></div>
 </body>
 
 </html>
